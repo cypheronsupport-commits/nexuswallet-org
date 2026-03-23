@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus Wallet — The Solana wallet for everyone</title>
+<meta name="description" content="Nexus Wallet is the fastest, most secure way to manage your Solana tokens. Swap, send, receive, and explore DApps.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f5f3ff;
+  color: #1a1a2e;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 16px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(20px);
+  background: rgba(12, 10, 26, 0.6);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+nav.scrolled {
+  background: rgba(245, 243, 255, 0.95);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+nav.scrolled .nav-logo { color: #1a1a2e; }
+nav.scrolled .nav-links a { color: #555; }
+nav.scrolled .nav-links { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.06); }
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 22px; font-weight: 800; color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.nav-logo-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-logo-icon svg { width: 36px; height: 36px; }
+.nav-links {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06);
+  padding: 6px 8px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: background 0.3s, border-color 0.3s;
+}
+.nav-links a {
+  text-decoration: none; color: rgba(255,255,255,0.7);
+  transition: color 0.3s;
+  font-size: 14px; font-weight: 500;
+  padding: 8px 18px; border-radius: 100px;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a:hover { color: #1a1a2e; background: rgba(124, 58, 237, 0.06); }
+.nav-download {
+  background: #7C3AED !important; color: white !important;
+  padding: 10px 24px !important; border-radius: 100px !important;
+  font-weight: 600 !important; font-size: 14px !important;
+  text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;
+}
+.nav-download:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 40px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: #0c0a1a;
+  overflow: hidden;
+}
+/* 3D tilted cards in background */
+.hero-card {
+  position: absolute;
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.08), rgba(124, 58, 237, 0.02));
+  border: 1px solid rgba(124, 58, 237, 0.1);
+  border-radius: 24px;
+  backdrop-filter: blur(4px);
+}
+.hero-card-1 { width: 350px; height: 450px; top: 5%; left: -5%; transform: rotate(-15deg) perspective(800px) rotateY(15deg); animation: cardFloat1 20s ease-in-out infinite; }
+.hero-card-2 { width: 300px; height: 400px; top: 10%; right: -3%; transform: rotate(12deg) perspective(800px) rotateY(-10deg); animation: cardFloat2 18s ease-in-out infinite; }
+.hero-card-3 { width: 280px; height: 380px; bottom: 5%; left: 15%; transform: rotate(-8deg) perspective(800px) rotateX(5deg); animation: cardFloat3 22s ease-in-out infinite; }
+.hero-card-4 { width: 320px; height: 420px; bottom: -5%; right: 12%; transform: rotate(10deg) perspective(800px) rotateY(8deg); animation: cardFloat1 25s ease-in-out infinite reverse; }
+.hero-card-5 { width: 250px; height: 350px; top: 30%; left: 35%; transform: rotate(-5deg); animation: cardFloat2 16s ease-in-out infinite; opacity: 0.5; }
+
+@keyframes cardFloat1 { 0%, 100% { transform: rotate(-15deg) perspective(800px) rotateY(15deg) translate(0,0); } 50% { transform: rotate(-15deg) perspective(800px) rotateY(15deg) translate(20px, -30px); } }
+@keyframes cardFloat2 { 0%, 100% { transform: rotate(12deg) perspective(800px) rotateY(-10deg) translate(0,0); } 50% { transform: rotate(12deg) perspective(800px) rotateY(-10deg) translate(-15px, 25px); } }
+@keyframes cardFloat3 { 0%, 100% { transform: rotate(-8deg) perspective(800px) rotateX(5deg) translate(0,0); } 50% { transform: rotate(-8deg) perspective(800px) rotateX(5deg) translate(25px, -20px); } }
+
+/* Floating crypto coins */
+.floating-coin {
+  position: absolute;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+.coin-sol { background: linear-gradient(135deg, #9945FF, #14F195); color: white; top: 15%; left: 12%; animation: coinFloat 8s ease-in-out infinite; }
+.coin-eth { background: #627EEA; color: white; top: 25%; right: 15%; animation: coinFloat 10s 1s ease-in-out infinite; }
+.coin-btc { background: #F7931A; color: white; bottom: 30%; left: 8%; animation: coinFloat 9s 2s ease-in-out infinite; }
+.coin-usdc { background: #2775CA; color: white; bottom: 20%; right: 10%; animation: coinFloat 7s 0.5s ease-in-out infinite; }
+.coin-ray { background: #5AC4BE; color: white; top: 75%; right: 30%; animation: coinFloat 11s 1.5s ease-in-out infinite; font-size: 14px; width: 36px; height: 36px; }
+.coin-bonk { background: #F59E0B; color: white; top: 40%; right: 25%; animation: coinFloat 8.5s 3s ease-in-out infinite; font-size: 14px; width: 36px; height: 36px; }
+.coin-usdt { background: #50AF95; color: white; top: 8%; right: 35%; animation: coinFloat 12s 2.5s ease-in-out infinite; font-size: 14px; width: 32px; height: 32px; }
+.coin-dot { background: #E6007A; color: white; top: 12%; left: 45%; animation: coinFloat 9.5s 1s ease-in-out infinite; font-size: 14px; width: 32px; height: 32px; }
+
+@keyframes coinFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+  50% { transform: translateY(-8px) rotate(-3deg) scale(0.98); }
+  75% { transform: translateY(-25px) rotate(2deg) scale(1.02); }
+}
+
+/* Ambient glow spots */
+.hero-glow {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+}
+.glow-1 { width: 500px; height: 500px; top: -10%; left: 20%; background: rgba(124, 58, 237, 0.12); animation: glowDrift 15s ease-in-out infinite; }
+.glow-2 { width: 400px; height: 400px; bottom: -10%; right: 15%; background: rgba(20, 241, 149, 0.06); animation: glowDrift 20s ease-in-out infinite reverse; }
+.glow-3 { width: 300px; height: 300px; top: 40%; right: 30%; background: rgba(167, 139, 250, 0.08); animation: glowDrift 12s 3s ease-in-out infinite; }
+@keyframes glowDrift { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(40px, -30px); } }
+
+.hero-content {
+  position: relative; z-index: 10;
+  max-width: 1200px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.hero-text { text-align: left; }
+.hero-phone-wrap { display: flex; justify-content: center; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  padding: 8px 20px; border-radius: 100px;
+  font-size: 14px; font-weight: 500; color: #AB9FF2;
+  margin-bottom: 32px;
+}
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #AB9FF2; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.hero h1 {
+  font-size: clamp(48px, 8vw, 88px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+  color: white;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, #7C3AED, #A78BFA, #C4B5FD, #7C3AED);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 300% center; } }
+
+.hero p {
+  font-size: 20px; color: rgba(255,255,255,0.5);
+  max-width: 560px; margin: 0 0 40px;
+  line-height: 1.6;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: white;
+  color: #1a1a2e;
+  padding: 16px 36px;
+  border-radius: 100px;
+  font-size: 17px; font-weight: 600;
+  text-decoration: none;
+  border: none;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124, 58, 237, 0.3); }
+.hero-cta .icon { font-size: 20px; }
+
+/* hero-image removed - now using hero-phone-wrap */
+.hero-phone {
+  width: 320px; height: auto;
+  background: #0E0E11;
+  border-radius: 36px;
+  padding: 12px;
+  box-shadow: 0 60px 120px rgba(124, 58, 237, 0.3), 0 20px 60px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.08);
+}
+.hero-phone-inner {
+  background: #0E0E11;
+  border-radius: 28px;
+  overflow: hidden;
+  padding: 16px;
+}
+
+/* ===== SECTION: TRADING TOOLS ===== */
+.section { padding: 120px 40px; }
+.section-center { text-align: center; max-width: 1200px; margin: 0 auto; }
+
+.section-title {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.section-sub {
+  font-size: 18px; color: #888;
+  max-width: 500px; margin: 0 auto 48px;
+  line-height: 1.6;
+}
+
+/* Features section */
+.features-section {
+  background: #f5f3ff;
+  padding: 120px 40px;
+}
+.features-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600; color: #7C3AED;
+  margin-bottom: 24px; letter-spacing: 0.05em;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.feature-card {
+  background: white;
+  border-radius: 24px;
+  padding: 40px 32px;
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.06); }
+.feature-card .card-icon {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin-bottom: 20px;
+}
+.feature-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.feature-card p { font-size: 15px; color: #888; line-height: 1.6; }
+
+.card-purple .card-icon { background: rgba(124, 58, 237, 0.1); color: #7C3AED; }
+.card-green .card-icon { background: rgba(20, 241, 149, 0.1); color: #059669; }
+.card-blue .card-icon { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+.card-orange .card-icon { background: rgba(245, 158, 11, 0.1); color: #D97706; }
+.card-pink .card-icon { background: rgba(236, 72, 153, 0.1); color: #EC4899; }
+.card-cyan .card-icon { background: rgba(6, 182, 212, 0.1); color: #06B6D4; }
+
+/* ===== BUY/SELL SECTION ===== */
+.trade-section {
+  background: #f5f3ff;
+  padding: 80px 40px 120px;
+}
+.trade-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: center;
+}
+.trade-text h2 {
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 900; line-height: 1.1;
+  letter-spacing: -0.02em; margin-bottom: 20px;
+}
+.trade-text p { font-size: 18px; color: #888; line-height: 1.6; margin-bottom: 32px; }
+.trade-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white;
+  padding: 14px 28px; border-radius: 100px;
+  font-size: 15px; font-weight: 600; color: #1a1a2e;
+  text-decoration: none;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.trade-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+.trade-mockup {
+  background: #0E0E11;
+  border-radius: 32px;
+  padding: 32px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.15);
+  color: white;
+}
+.mockup-header { display: flex; justify-content: space-between; margin-bottom: 24px; }
+.mockup-label { font-size: 12px; color: #888; }
+.mockup-amount { font-size: 36px; font-weight: 800; margin: 8px 0; }
+.mockup-token {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #1a1a2a; padding: 8px 14px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+}
+.mockup-token .dot { width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, #9945FF, #14F195); }
+.mockup-divider { text-align: center; padding: 16px 0; color: #555; font-size: 20px; }
+.mockup-receive { padding: 20px; background: #1a1a2a; border-radius: 16px; }
+.mockup-btn {
+  display: block; width: 100%;
+  padding: 16px; margin-top: 24px;
+  background: linear-gradient(135deg, #7C3AED, #AB9FF2);
+  border: none; border-radius: 16px;
+  color: white; font-size: 16px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* ===== SECURITY SECTION (DARK) ===== */
+.security-section {
+  background: #1a1040;
+  color: white;
+  padding: 120px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.security-section::before {
+  content: '';
+  position: absolute; top: -300px; right: -200px;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+}
+.security-section .section-title { color: white; }
+.security-section .section-sub { color: rgba(255,255,255,0.5); }
+
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.security-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: left;
+  transition: background 0.3s;
+}
+.security-card:hover { background: rgba(255,255,255,0.08); }
+.security-card .s-icon { font-size: 32px; margin-bottom: 16px; }
+.security-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.security-card p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* ===== MULTICHAIN SECTION ===== */
+.multichain-section {
+  background: #f5f3ff;
+  padding: 120px 40px;
+}
+.chain-logos {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+}
+.chain-item {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.chain-circle {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700;
+  transition: transform 0.2s;
+}
+.chain-circle:hover { transform: scale(1.1); }
+.chain-item span { font-size: 13px; font-weight: 600; color: #888; }
+
+/* ===== CTA SECTION ===== */
+.cta-section {
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  padding: 120px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+.cta-section .section-title { color: white; position: relative; }
+.cta-section .section-sub { color: rgba(255,255,255,0.7); position: relative; }
+.cta-btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: white;
+  color: #7C3AED;
+  padding: 18px 40px;
+  border-radius: 100px;
+  font-size: 18px; font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+
+/* ===== NEWSLETTER ===== */
+.newsletter-section {
+  background: #0E0E11;
+  padding: 80px 40px;
+}
+.newsletter-inner {
+  max-width: 800px; margin: 0 auto;
+  display: flex; align-items: center; gap: 40px;
+}
+.newsletter-icon { font-size: 48px; flex-shrink: 0; }
+.newsletter-form {
+  flex: 1;
+  display: flex;
+  background: #1a1a2a;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #2a2a3a;
+}
+.newsletter-form input {
+  flex: 1; padding: 18px 24px;
+  background: transparent; border: none;
+  color: white; font-size: 16px;
+  outline: none;
+}
+.newsletter-form input::placeholder { color: #555; }
+.newsletter-form button {
+  padding: 18px 32px;
+  background: #7C3AED;
+  border: none; color: white;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.newsletter-form button:hover { background: #6D28D9; }
+
+/* ===== FOOTER ===== */
+footer {
+  background: #0E0E11;
+  border-top: 1px solid #1a1a2a;
+  padding: 60px 40px 40px;
+}
+.footer-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+.footer-brand .nav-logo { margin-bottom: 16px; color: white; }
+.footer-brand p { font-size: 14px; color: #555; line-height: 1.6; max-width: 280px; }
+.footer-col h4 {
+  font-size: 13px; font-weight: 700; color: #888;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+.footer-col a {
+  display: block;
+  font-size: 14px; color: #555;
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: #AB9FF2; }
+.footer-bottom {
+  max-width: 1200px; margin: 40px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid #1a1a2a;
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: #444;
+}
+
+/* ===== ANIMATIONS ===== */
+/* Base animation classes */
+.anim {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim.visible { opacity: 1; transform: translateY(0); }
+
+.anim-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-left.visible { opacity: 1; transform: translateX(0); }
+
+.anim-right {
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-right.visible { opacity: 1; transform: translateX(0); }
+
+.anim-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-scale.visible { opacity: 1; transform: scale(1); }
+
+/* Stagger delays for children */
+.stagger > *:nth-child(1) { transition-delay: 0ms; }
+.stagger > *:nth-child(2) { transition-delay: 100ms; }
+.stagger > *:nth-child(3) { transition-delay: 200ms; }
+.stagger > *:nth-child(4) { transition-delay: 300ms; }
+.stagger > *:nth-child(5) { transition-delay: 400ms; }
+.stagger > *:nth-child(6) { transition-delay: 500ms; }
+
+/* Hero entrance animations */
+.hero-badge { animation: heroFadeDown 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero h1 { animation: heroFadeDown 0.8s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero p { animation: heroFadeDown 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-cta { animation: heroFadeDown 0.8s 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-image { animation: heroPhoneUp 1.2s 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes heroFadeDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroPhoneUp {
+  from { opacity: 0; transform: translateY(80px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Floating phone animation */
+.hero-phone {
+  animation: phoneFloat 6s ease-in-out infinite;
+}
+@keyframes phoneFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-12px) rotate(0.5deg); }
+  75% { transform: translateY(8px) rotate(-0.5deg); }
+}
+
+/* Glow pulse on phone */
+.hero-phone::after {
+  content: '';
+  position: absolute; inset: -20px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+  border-radius: 50px;
+  animation: glowPulse 4s ease-in-out infinite;
+  z-index: -1;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Feature card hover animations */
+.feature-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+}
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px rgba(124, 58, 237, 0.1);
+}
+.feature-card .card-icon {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.feature-card:hover .card-icon {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+/* Security cards glow on hover */
+.security-card {
+  transition: background 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+}
+.security-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 30px rgba(124, 58, 237, 0.1);
+}
+.security-card .s-icon {
+  transition: transform 0.4s;
+}
+.security-card:hover .s-icon {
+  transform: scale(1.2);
+}
+
+/* Chain icons bounce on hover */
+.chain-circle {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.chain-circle:hover {
+  transform: scale(1.15) translateY(-8px);
+}
+
+/* Trade mockup tilt */
+.trade-mockup {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+}
+.trade-mockup:hover {
+  transform: perspective(800px) rotateY(-3deg) translateY(-4px);
+  box-shadow: 0 50px 100px rgba(0,0,0,0.2);
+}
+
+/* CTA button pulse */
+.cta-btn {
+  position: relative;
+  animation: ctaPulse 3s ease-in-out infinite;
+}
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+}
+
+/* Mockup swap button shimmer */
+.mockup-btn {
+  position: relative; overflow: hidden;
+}
+.mockup-btn::after {
+  content: '';
+  position: absolute; top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: rotate(45deg);
+  animation: btnShimmer 3s infinite;
+}
+@keyframes btnShimmer {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Nav download button shine */
+.nav-download {
+  position: relative; overflow: hidden;
+}
+.nav-download::after {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: navShine 4s infinite;
+}
+@keyframes navShine {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+/* Parallax background orbs */
+.hero-bg .orb1 {
+  position: absolute; top: 10%; right: 15%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: orbFloat1 12s ease-in-out infinite;
+}
+.hero-bg .orb2 {
+  position: absolute; bottom: 20%; left: 10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: orbFloat2 15s ease-in-out infinite;
+}
+.hero-bg .orb3 {
+  position: absolute; top: 40%; left: 50%;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(20, 241, 149, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: orbFloat3 10s ease-in-out infinite;
+}
+@keyframes orbFloat1 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, 30px); } }
+@keyframes orbFloat2 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, -40px); } }
+@keyframes orbFloat3 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-20px, -30px); } }
+
+/* Backward compat */
+.fade-in {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s, transform 0.8s;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .security-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  nav { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero h1 { font-size: 42px; }
+  .hero-content { grid-template-columns: 1fr; text-align: center; }
+  .hero-text { text-align: center; }
+  .hero-text p { margin: 0 auto 40px; }
+  .hero-cta { margin: 0 auto; }
+  .section { padding: 80px 20px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .security-grid { grid-template-columns: 1fr; }
+  .trade-grid { grid-template-columns: 1fr; gap: 40px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .newsletter-inner { flex-direction: column; }
+  .chain-logos { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="nxG" x1="0" y1="40" x2="40" y2="0"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#nxG)"/><path d="M12 29V11h3.2l10.6 13V11H29v18h-3.2L15.2 16v13H12z" fill="white"/></svg></div>
+    nexus
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#security">Security</a>
+    <a href="#chains">Chains</a>
+    <a href="https://support.nexuswallet.com" target="_blank">Support</a>
+  </div>
+  <a href="https://chrome.google.com/webstore/detail/nexus-wallet/ajhnlmebdlgghbfaoleihpchdmmmgbmg" class="nav-download" target="_blank">Download</a>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-bg">
+    <!-- Ambient glows -->
+    <div class="hero-glow glow-1"></div>
+    <div class="hero-glow glow-2"></div>
+    <div class="hero-glow glow-3"></div>
+    <!-- 3D floating cards -->
+    <div class="hero-card hero-card-1"></div>
+    <div class="hero-card hero-card-2"></div>
+    <div class="hero-card hero-card-3"></div>
+    <div class="hero-card hero-card-4"></div>
+    <div class="hero-card hero-card-5"></div>
+    <!-- Floating crypto coins with real logos -->
+    <div class="floating-coin coin-sol"><svg width="28" height="28" viewBox="0 0 128 128" fill="none"><path d="M26.5 96.5h75l-18.8-18.8H26.5l18.8 18.8z" fill="white"/><path d="M26.5 50.3h75L82.7 31.5H26.5L45.3 50.3z" fill="white"/><path d="M101.5 69.1H26.5l18.8 18.8h75L101.5 69.1z" fill="white" opacity=".7"/></svg></div>
+    <div class="floating-coin coin-eth"><svg width="24" height="24" viewBox="0 0 256 417" fill="none"><path d="M127.9 0L125.2 9.2V285l2.7 2.7L256 213.3 127.9 0z" fill="white" opacity=".6"/><path d="M127.9 0L0 213.3l127.9 72.4V0z" fill="white"/></svg></div>
+    <div class="floating-coin coin-btc"><svg width="24" height="24" viewBox="0 0 64 64" fill="none"><path d="M43.7 27.3c.6-3.8-2.3-5.8-6.3-7.2l1.3-5.2-3.2-.8-1.3 5c-.8-.2-1.7-.4-2.5-.6l1.3-5.1-3.2-.8-1.3 5.2c-.7-.2-1.3-.3-1.9-.5l-4.4-1.1-.8 3.4s2.3.5 2.3.6c1.3.3 1.5 1.2 1.5 1.8l-1.5 6c.1 0 .2 0 .3.1h-.3l-2.1 8.3c-.2.4-.5 1.1-1.4.8 0 0-2.3-.6-2.3-.6l-1.6 3.6 4.2 1 2.3.6-1.3 5.2 3.2.8 1.3-5.2c.9.2 1.7.4 2.5.6l-1.3 5.1 3.2.8 1.3-5.2c5.5 1 9.6.6 11.3-4.3 1.4-4-.1-6.2-2.9-7.7 2.1-.5 3.6-1.8 4-4.6z" fill="white"/></svg></div>
+    <div class="floating-coin coin-usdc"><svg width="24" height="24" viewBox="0 0 32 32" fill="none"><path d="M16 32c8.8 0 16-7.2 16-16S24.8 0 16 0 0 7.2 0 16s7.2 16 16 16z" fill="#2775CA"/><path d="M20.4 18.4c0-2.4-1.4-3.2-4.4-3.6-2.1-.3-2.5-.9-2.5-2s.9-1.8 2.5-1.8c1.4 0 2.2.5 2.6 1.7.1.2.3.3.5.3h1.1c.3 0 .5-.2.5-.5-.3-1.6-1.4-2.8-3.2-3.1V7.6c0-.3-.2-.5-.5-.5h-1c-.3 0-.5.2-.5.5v1.8c-2.2.3-3.6 1.7-3.6 3.5 0 2.3 1.4 3.1 4.4 3.5 2 .4 2.5.9 2.5 2.1s-1.1 2-2.7 2c-2.1 0-2.8-.9-3.1-2-.1-.2-.3-.4-.5-.4h-1.2c-.3 0-.5.2-.5.5.4 1.8 1.5 3.1 3.6 3.5v1.9c0 .3.2.5.5.5h1c.3 0 .5-.2.5-.5V22c2.3-.3 3.7-1.8 3.7-3.6z" fill="white"/></svg></div>
+    <div class="floating-coin coin-ray"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="none" stroke="white" stroke-width="2"/><path d="M12 10h8l-4 12-4-12z" fill="white"/></svg></div>
+    <div class="floating-coin coin-bonk"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" fill="white" opacity=".9"/><text x="16" y="21" font-size="14" font-weight="bold" fill="#F59E0B" text-anchor="middle">B</text></svg></div>
+    <div class="floating-coin coin-usdt"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M17.9 17.3v-.1c-.1 0-1-.1-2.8-.1s-2.6 0-2.8.1v.1c-3.1.1-5.4.7-5.4 1.3s2.3 1.2 5.4 1.3v4.2h3.6V20c3.1-.1 5.4-.7 5.4-1.3s-2.4-1.2-5.4-1.4zM16 6.7l5.6 4.5H22v1.6H10v-1.6h.4L16 6.7z" fill="white"/></svg></div>
+    <div class="floating-coin coin-dot"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="4" fill="white"/><circle cx="16" cy="6" r="3" fill="white"/><circle cx="16" cy="26" r="3" fill="white"/><circle cx="7" cy="11" r="3" fill="white"/><circle cx="25" cy="11" r="3" fill="white"/><circle cx="7" cy="21" r="3" fill="white"/><circle cx="25" cy="21" r="3" fill="white"/></svg></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-badge"><span class="dot"></span> The crypto wallet for everyone</div>
+      <h1>Your home for<br><span class="gradient">Solana</span> and beyond</h1>
+      <p>The safest, fastest, and most beautiful way to manage your crypto. Send, swap, and explore the Solana ecosystem.</p>
+      <a href="https://chrome.google.com/webstore/detail/nexus-wallet/ajhnlmebdlgghbfaoleihpchdmmmgbmg" class="hero-cta" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 8v8M8 12l4 4 4-4"/></svg>
+        Download Nexus
+      </a>
+    </div>
+
+    <div class="hero-phone-wrap">
+      <div class="hero-phone">
+        <div class="hero-phone-inner">
+          <!-- Wallet mockup -->
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#AB9FF2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;">A</div>
+              <div><div style="font-size:13px;font-weight:600;color:white;">Account 1</div><div style="font-size:10px;color:#666;">DT7v...RE21</div></div>
+            </div>
+            <div style="font-size:10px;color:#14F195;background:rgba(20,241,149,0.1);padding:3px 10px;border-radius:100px;">Mainnet</div>
+          </div>
+          <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:32px;font-weight:800;color:white;">$1,247.83</div>
+            <div style="font-size:12px;color:#14F195;margin-top:4px;">+$12.45 (+1.01%)</div>
+          </div>
+          <div style="display:flex;justify-content:center;gap:20px;margin-bottom:24px;">
+            <div style="text-align:center;"><div style="width:40px;height:40px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#AB9FF2;font-size:16px;">&#8593;</div><div style="font-size:10px;color:#888;">Send</div></div>
+            <div style="text-align:center;"><div style="width:40px;height:40px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#AB9FF2;font-size:16px;">&#8645;</div><div style="font-size:10px;color:#888;">Swap</div></div>
+            <div style="text-align:center;"><div style="width:40px;height:40px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#AB9FF2;font-size:16px;">&#8595;</div><div style="font-size:10px;color:#888;">Receive</div></div>
+            <div style="text-align:center;"><div style="width:40px;height:40px;border-radius:50%;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#AB9FF2;font-size:16px;">+</div><div style="font-size:10px;color:#888;">Buy</div></div>
+          </div>
+          <div style="font-size:11px;color:#555;font-weight:600;margin-bottom:12px;">Tokens</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a1a2a;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#9945FF,#14F195);"></div>
+              <div><div style="font-size:12px;font-weight:600;color:white;">Solana</div><div style="font-size:10px;color:#666;">8.452 SOL</div></div>
+            </div>
+            <div style="text-align:right;"><div style="font-size:12px;font-weight:600;color:white;">$1,203.47</div><div style="font-size:10px;color:#14F195;">+3.74%</div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a1a2a;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#2775CA;"></div>
+              <div><div style="font-size:12px;font-weight:600;color:white;">USD Coin</div><div style="font-size:10px;color:#666;">44.36 USDC</div></div>
+            </div>
+            <div style="text-align:right;"><div style="font-size:12px;font-weight:600;color:white;">$44.36</div><div style="font-size:10px;color:#14F195;">+0.01%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="features-section" id="features">
+  <div class="section-center anim">
+    <div class="features-label">&#9889; FEATURES</div>
+    <h2 class="section-title">Trading tools<br>for everyone</h2>
+    <p class="section-sub">Everything you need to manage your crypto portfolio, all in one beautiful extension.</p>
+  </div>
+  <div class="features-grid stagger">
+    <div class="feature-card card-purple anim">
+      <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+      <h3>Instant Swaps</h3>
+      <p>Swap any SPL token instantly with the best prices via Jupiter aggregator. Zero hassle.</p>
+    </div>
+    <div class="feature-card card-green anim">
+      <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <h3>Lightning Fast</h3>
+      <p>Sub-second transaction confirmations on Solana. Send tokens anywhere in the world instantly.</p>
+    </div>
+    <div class="feature-card card-blue anim">
+      <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+      <h3>Real-Time Prices</h3>
+      <p>Live token prices, portfolio tracking, and 24h change indicators for all your holdings.</p>
+    </div>
+    <div class="feature-card card-orange anim">
+      <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <h3>NFT Gallery</h3>
+      <p>View, manage, and send your NFT collection. Beautiful gallery view with collection grouping.</p>
+    </div>
+    <div class="feature-card card-pink anim">
+      <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+      <h3>Multi-Account</h3>
+      <p>Create unlimited accounts from a single seed phrase. Switch between wallets in one tap.</p>
+    </div>
+    <div class="feature-card card-cyan anim">
+      <div class="card-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <h3>DApp Browser</h3>
+      <p>Connect to any Solana DApp securely. Full permission controls and transaction previews.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SWAP SECTION ===== -->
+<section class="trade-section">
+  <div class="trade-grid">
+    <div class="trade-text anim-left">
+      <h2>Buy and sell crypto in an instant.</h2>
+      <p>Swap tokens directly inside the wallet. Best price routing across all Solana DEXs powered by Jupiter.</p>
+      <a href="#features" class="trade-btn">See more &#8599;</a>
+    </div>
+    <div class="trade-mockup anim-right">
+      <div class="mockup-label">You pay</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+        <div class="mockup-amount">2.5</div>
+        <div class="mockup-token"><span class="dot"></span> SOL</div>
+      </div>
+      <div style="font-size:12px;color:#666;margin-top:4px;">Balance: 8.452 SOL</div>
+      <div class="mockup-divider">&#8595;</div>
+      <div class="mockup-receive">
+        <div class="mockup-label">You receive</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+          <div style="font-size:28px;font-weight:800;">355.95</div>
+          <div class="mockup-token"><span class="dot" style="background:#50AF95;"></span> USDT</div>
+        </div>
+        <div style="font-size:12px;color:#666;margin-top:4px;">&#8776; $355.95 USD</div>
+      </div>
+      <button class="mockup-btn">Swap</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECURITY ===== -->
+<section class="security-section" id="security">
+  <div class="section-center anim">
+    <h2 class="section-title">Controlled by you,<br>secured by us</h2>
+    <p class="section-sub">Your keys, your crypto. Nexus never has access to your funds.</p>
+  </div>
+  <div class="security-grid stagger">
+    <div class="security-card anim">
+      <div class="s-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#AB9FF2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg></div>
+      <h3>Self-Custodial</h3>
+      <p>Your private keys are encrypted locally. We never store or transmit them.</p>
+    </div>
+    <div class="security-card anim">
+      <div class="s-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#AB9FF2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+      <h3>Transaction Preview</h3>
+      <p>See exactly what will happen before you approve any transaction.</p>
+    </div>
+    <div class="security-card anim">
+      <div class="s-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#AB9FF2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <h3>Scam Detection</h3>
+      <p>Built-in warnings for suspicious tokens and malicious DApps.</p>
+    </div>
+    <div class="security-card anim">
+      <div class="s-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#AB9FF2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 7v5l3 3"/><circle cx="12" cy="12" r="6" fill="none"/></svg></div>
+      <h3>Auto-Lock</h3>
+      <p>Wallet locks automatically after inactivity for maximum protection.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MULTICHAIN ===== -->
+<section class="multichain-section" id="chains">
+  <div class="section-center anim">
+    <h2 class="section-title">One wallet,<br>multiple chains</h2>
+    <p class="section-sub">Access the best of every blockchain ecosystem from a single wallet.</p>
+    <div class="chain-logos stagger">
+      <div class="chain-item anim">
+        <div class="chain-circle" style="background:linear-gradient(135deg,#9945FF,#14F195);">
+          <svg width="36" height="36" viewBox="0 0 128 128" fill="none"><path d="M26.5 96.5h75l-18.8-18.8H26.5l18.8 18.8z" fill="white"/><path d="M26.5 50.3h75L82.7 31.5H26.5L45.3 50.3z" fill="white"/><path d="M101.5 69.1H26.5l18.8 18.8h75L101.5 69.1z" fill="white" opacity=".7"/></svg>
+        </div>
+        <span>Solana</span>
+      </div>
+      <div class="chain-item anim">
+        <div class="chain-circle" style="background:#627EEA;">
+          <svg width="36" height="36" viewBox="0 0 256 417" fill="none"><path d="M127.9 0L125.2 9.2V285l2.7 2.7L256 213.3 127.9 0z" fill="white" opacity=".6"/><path d="M127.9 0L0 213.3l127.9 72.4V0z" fill="white"/><path d="M127.9 310l-1.5 1.9v98.2l1.5 4.5L256 237.6 127.9 310z" fill="white" opacity=".6"/><path d="M127.9 414.6V310L0 237.6l127.9 177z" fill="white"/></svg>
+        </div>
+        <span>Ethereum</span>
+      </div>
+      <div class="chain-item anim">
+        <div class="chain-circle" style="background:#F7931A;">
+          <svg width="36" height="36" viewBox="0 0 64 64" fill="none"><path d="M43.7 27.3c.6-3.8-2.3-5.8-6.3-7.2l1.3-5.2-3.2-.8-1.3 5c-.8-.2-1.7-.4-2.5-.6l1.3-5.1-3.2-.8-1.3 5.2c-.7-.2-1.3-.3-1.9-.5l-4.4-1.1-.8 3.4s2.3.5 2.3.6c1.3.3 1.5 1.2 1.5 1.8l-1.5 6c.1 0 .2 0 .3.1h-.3l-2.1 8.3c-.2.4-.5 1.1-1.4.8 0 0-2.3-.6-2.3-.6l-1.6 3.6 4.2 1 2.3.6-1.3 5.2 3.2.8 1.3-5.2c.9.2 1.7.4 2.5.6l-1.3 5.1 3.2.8 1.3-5.2c5.5 1 9.6.6 11.3-4.3 1.4-4-.1-6.2-2.9-7.7 2.1-.5 3.6-1.8 4-4.6zm-7.2 10c-1 4-7.7 1.8-9.9 1.3l1.8-7c2.2.5 9.2 1.6 8.1 5.7zm1-10.1c-.9 3.6-6.5 1.8-8.3 1.3l1.6-6.4c1.8.5 7.7 1.3 6.7 5.1z" fill="white"/></svg>
+        </div>
+        <span>Bitcoin</span>
+      </div>
+      <div class="chain-item anim">
+        <div class="chain-circle" style="background:#8247E5;">
+          <svg width="36" height="36" viewBox="0 0 38 33" fill="none"><path d="M29 10.3c-.7-.4-1.6-.4-2.4 0l-5.6 3.3-3.8 2.1-5.5 3.3c-.7.4-1.6.4-2.4 0l-4.3-2.5c-.7-.4-1.2-1.2-1.2-2.1v-4.9c0-.8.4-1.6 1.2-2.1l4.3-2.5c.7-.4 1.6-.4 2.4 0l4.3 2.5c.7.4 1.2 1.2 1.2 2.1v3.3l3.8-2.2v-3.4c0-.8-.4-1.6-1.2-2.1L14.2.6c-.7-.4-1.6-.4-2.4 0L4 5.1C3.2 5.5 2.8 6.3 2.8 7v9.8c0 .8.4 1.6 1.2 2.1l7.8 4.5c.7.4 1.6.4 2.4 0l5.5-3.2 3.8-2.2 5.5-3.2c.7-.4 1.6-.4 2.4 0l4.3 2.5c.7.4 1.2 1.2 1.2 2.1v4.9c0 .8-.4 1.6-1.2 2.1l-4.2 2.5c-.7.4-1.6.4-2.4 0l-4.3-2.5c-.7-.4-1.2-1.2-1.2-2.1v-3.2l-3.8 2.2v3.3c0 .8.4 1.6 1.2 2.1l7.8 4.5c.7.4 1.6.4 2.4 0l7.8-4.5c.7-.4 1.2-1.2 1.2-2.1V17c0-.8-.4-1.6-1.2-2.1L29 10.3z" fill="white"/></svg>
+        </div>
+        <span>Polygon</span>
+      </div>
+      <div class="chain-item anim">
+        <div class="chain-circle" style="background:#FF0420;">
+          <svg width="36" height="36" viewBox="0 0 500 500" fill="none"><circle cx="250" cy="250" r="200" fill="none" stroke="white" stroke-width="40"/><circle cx="310" cy="190" r="50" fill="white"/></svg>
+        </div>
+        <span>Optimism</span>
+      </div>
+      <div class="chain-item anim">
+        <div class="chain-circle" style="background:#0052FF;">
+          <svg width="36" height="36" viewBox="0 0 111 111" fill="none"><path d="M55.5 111C86.2 111 111 86.2 111 55.5S86.2 0 55.5 0 0 24.8 0 55.5 24.8 111 55.5 111z" fill="#0052FF"/><path d="M55.7 93.1c-20.8 0-37.6-16.8-37.6-37.6s16.8-37.6 37.6-37.6c17.8 0 32.7 12.3 36.6 28.9H111C106.8 22.4 83.5 2 55.7 2 26 2 2 26 2 55.5s24 53.5 53.7 53.5c27.8 0 51.1-20.4 55.3-46.8H92.3c-3.9 16.6-18.8 28.9-36.6 28.9z" fill="white"/></svg>
+        </div>
+        <span>Base</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section">
+  <div class="anim-scale">
+    <h2 class="section-title">Get started.<br>Download Nexus.</h2>
+    <p class="section-sub" style="margin-bottom:40px;">Join thousands of users who trust Nexus to manage their crypto.</p>
+    <a href="https://chrome.google.com/webstore/detail/nexus-wallet/ajhnlmebdlgghbfaoleihpchdmmmgbmg" class="cta-btn" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Nexus
+    </a>
+  </div>
+</section>
+
+<!-- ===== NEWSLETTER ===== -->
+<section class="newsletter-section">
+  <div class="newsletter-inner">
+    <div class="nav-logo-icon" style="width:48px;height:48px;flex-shrink:0;"><svg viewBox="0 0 40 40" fill="none"><defs><linearGradient id="nxG3" x1="0" y1="40" x2="40" y2="0"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#nxG3)"/><path d="M12 29V11h3.2l10.6 13V11H29v18h-3.2L15.2 16v13H12z" fill="white"/></svg></div>
+    <div class="newsletter-form">
+      <input type="email" placeholder="Enter your email">
+      <button type="submit">Subscribe</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="nxG" x1="0" y1="40" x2="40" y2="0"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#nxG)"/><path d="M12 29V11h3.2l10.6 13V11H29v18h-3.2L15.2 16v13H12z" fill="white"/></svg></div>
+        nexus
+      </a>
+      <p>The safest and most beautiful crypto wallet for Solana and beyond.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <a href="#features">Features</a>
+      <a href="#security">Security</a>
+      <a href="#chains">Chains</a>
+      <a href="#">Changelog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="#">Help Center</a>
+      <a href="#">Documentation</a>
+      <a href="#">Status</a>
+      <a href="#">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>&copy; 2026 Nexus Wallet. All rights reserved.</div>
+    <div style="display:flex;gap:20px;">
+      <a href="#" style="color:#555;text-decoration:none;">Discord</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll effect - switches from dark to light when past hero
+const nav = document.getElementById('navbar');
+const heroEl = document.querySelector('.hero');
+window.addEventListener('scroll', () => {
+  const heroBottom = heroEl ? heroEl.offsetHeight - 100 : 600;
+  nav.classList.toggle('scrolled', window.scrollY > heroBottom);
+});
+
+// Scroll-triggered animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.anim, .anim-left, .anim-right, .anim-scale, .fade-in').forEach(el => observer.observe(el));
+
+// Parallax on mouse move (hero only)
+const heroBg = document.querySelector('.hero-bg');
+document.addEventListener('mousemove', (e) => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 20;
+  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+  if (heroBg) {
+    const orbs = heroBg.querySelectorAll('.orb1, .orb2, .orb3');
+    orbs.forEach((orb, i) => {
+      const speed = (i + 1) * 0.5;
+      orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+    });
+  }
+});
+
+// Tilt effect on phone mockup
+const phone = document.querySelector('.hero-phone');
+if (phone) {
+  phone.addEventListener('mousemove', (e) => {
+    const rect = phone.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    phone.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(${Math.sin(Date.now()/1000)*6}px)`;
+  });
+  phone.addEventListener('mouseleave', () => {
+    phone.style.transform = '';
+  });
+}
+
+// Counter animation for stats (if any)
+function animateNumber(el, target) {
+  let current = 0;
+  const increment = target / 60;
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= target) { current = target; clearInterval(timer); }
+    el.textContent = Math.floor(current).toLocaleString();
+  }, 16);
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>
