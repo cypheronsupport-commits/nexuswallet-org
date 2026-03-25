@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Translator — AI-Powered Text Tools</title>
+  <meta name="description" content="Select text to instantly translate, summarize, explain, or rewrite. Free AI-powered Chrome extension with 20+ languages.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: #08080d;
+      color: #f0f0f5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Ambient Background ---- */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .ambient .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      animation: float 20s ease-in-out infinite;
+    }
+    .ambient .orb-1 { width: 600px; height: 600px; background: #6C3CE1; top: -200px; left: -100px; }
+    .ambient .orb-2 { width: 500px; height: 500px; background: #3B82F6; bottom: -150px; right: -100px; animation-delay: -7s; }
+    .ambient .orb-3 { width: 400px; height: 400px; background: #a78bfa; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -14s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -40px) scale(1.05); }
+      66% { transform: translate(-20px, 30px) scale(0.95); }
+    }
+
+    /* ---- Container ---- */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ---- Nav ---- */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo img { width: 36px; height: 36px; border-radius: 10px; }
+    .nav-logo span {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f0f0f5;
+      letter-spacing: -0.3px;
+    }
+    .nav-logo .badge {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #6C3CE1, #3B82F6);
+      color: #fff;
+      vertical-align: middle;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: #8888a0;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #f0f0f5; }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6C3CE1, #7C5CE7);
+      color: #fff !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(108, 60, 225, 0.3);
+      transition: all 0.25s;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(108, 60, 225, 0.4); }
+
+    /* ---- Hero ---- */
+    .hero {
+      text-align: center;
+      padding: 80px 0 60px;
+    }
+    .hero-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 22px;
+      margin: 0 auto 28px;
+      display: block;
+    }
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #6C3CE1, #3B82F6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 18px;
+      color: #8888a0;
+      max-width: 560px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #6C3CE1, #7C5CE7);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(108, 60, 225, 0.35);
+      transition: all 0.25s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108, 60, 225, 0.45); }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #c0c0d0;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+
+    /* ---- Stats ---- */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      margin: 20px 0 60px;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f0f0f5, #6C3CE1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label { font-size: 13px; color: #55556a; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+    /* ---- Features ---- */
+    .features { padding: 40px 0 80px; }
+    .section-title {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center;
+      font-size: 16px;
+      color: #8888a0;
+      margin-bottom: 48px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 18px;
+      padding: 28px 24px;
+      transition: all 0.3s;
+    }
+    .feature-card:hover {
+      background: rgba(108, 60, 225, 0.04);
+      border-color: rgba(108, 60, 225, 0.15);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+    .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 13px; color: #8888a0; line-height: 1.6; }
+
+    /* ---- How It Works ---- */
+    .how-it-works { padding: 40px 0 80px; }
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .step {
+      text-align: center;
+      max-width: 280px;
+    }
+    .step-number {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #6C3CE1, #3B82F6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: #fff;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 20px rgba(108, 60, 225, 0.3);
+    }
+    .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 13px; color: #8888a0; line-height: 1.6; }
+
+    /* ---- Languages ---- */
+    .languages { padding: 40px 0 60px; }
+    .lang-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .lang-tag {
+      padding: 8px 18px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      font-weight: 500;
+      color: #c0c0d0;
+      transition: all 0.2s;
+    }
+    .lang-tag:hover {
+      background: rgba(108, 60, 225, 0.08);
+      border-color: rgba(108, 60, 225, 0.2);
+      color: #a78bfa;
+    }
+
+    /* ---- CTA ---- */
+    .cta-section {
+      text-align: center;
+      padding: 60px 0 80px;
+    }
+    .cta-card {
+      background: linear-gradient(145deg, rgba(108, 60, 225, 0.08), rgba(59, 130, 246, 0.05));
+      border: 1px solid rgba(108, 60, 225, 0.15);
+      border-radius: 24px;
+      padding: 56px 40px;
+    }
+    .cta-card h2 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+    .cta-card p { font-size: 16px; color: #8888a0; margin-bottom: 28px; }
+
+    /* ---- Footer ---- */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p { font-size: 13px; color: #55556a; }
+    footer a { color: #6C3CE1; text-decoration: none; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 36px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .stats { flex-direction: column; gap: 24px; }
+      .steps { flex-direction: column; align-items: center; }
+      .nav-links { display: none; }
+    }
+
+    /* Google Ads */
+    .ad-container {
+      max-width: 728px;
+      margin: 0 auto 40px;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6693622655550119" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="ambient">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Nav -->
+  <div class="container">
+    <nav>
+      <a href="#" class="nav-logo">
+        <img src="https://raw.githubusercontent.com/cypheronsupport-commits/nexuswallet-org/master/nexus-translator-128.png" alt="Nexus Translator" onerror="this.style.display='none'">
+        <span>Nexus <span class="badge">TRANSLATOR</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#languages">Languages</a>
+        <a href="https://nexuswallet.org">Nexus Wallet</a>
+        <a href="https://chrome.google.com/webstore" class="nav-cta">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Install Free
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <div class="container">
+    <section class="hero">
+      <img src="https://raw.githubusercontent.com/cypheronsupport-commits/nexuswallet-org/master/nexus-translator-128.png" alt="Nexus Translator" class="hero-icon" onerror="this.style.display='none'">
+      <h1>Translate Any Text<br><span class="gradient">Instantly with AI</span></h1>
+      <p>Select text on any webpage to instantly translate, summarize, explain, or rewrite it. Four powerful AI tools in one free Chrome extension.</p>
+      <div class="hero-buttons">
+        <a href="https://chrome.google.com/webstore" class="btn-primary" id="download">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg>
+          Add to Chrome — Free
+        </a>
+        <a href="#features" class="btn-secondary">
+          Learn More
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-value">20+</div>
+        <div class="stat-label">Languages</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">4</div>
+        <div class="stat-label">AI Tools</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Cost</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">&infin;</div>
+        <div class="stat-label">Translations</div>
+      </div>
+    </div>
+
+    <!-- Ad -->
+    <div class="ad-container">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6693622655550119" data-ad-slot="4313080520" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <!-- Features -->
+    <section class="features" id="features">
+      <h2 class="section-title">4 Powerful AI Tools</h2>
+      <p class="section-sub">Everything you need to work with text on any webpage</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(108,60,225,0.12);">🌐</div>
+          <h3>Translate</h3>
+          <p>Instantly translate selected text between 20+ languages with auto-detection. Powered by MyMemory translation engine for accurate results.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(59,130,246,0.12);">📝</div>
+          <h3>Summarize</h3>
+          <p>Extract key points from long text instantly. The intelligent engine identifies the most important sentences so you get the gist fast.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(34,197,94,0.12);">💡</div>
+          <h3>Explain</h3>
+          <p>Get word definitions, phonetics, and part-of-speech details. For longer text, receive topic analysis, structure breakdown, and key points.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(245,158,11,0.12);">✏️</div>
+          <h3>Rewrite</h3>
+          <p>Paraphrase text with improved vocabulary and clearer phrasing. Perfect for students, writers, and professionals refining their language.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(167,139,250,0.12);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          </div>
+          <h3>Sidebar Panel</h3>
+          <p>Open the full-featured sidebar for an enhanced experience. Change languages, run actions, and view all results in one beautiful panel.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(236,72,153,0.12);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </div>
+          <h3>Context Menu</h3>
+          <p>Right-click any selected text to access all four tools from the context menu. Fast, convenient, and always available.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-sub">Three simple steps to translate anything</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Select Text</h3>
+          <p>Highlight any text on any webpage. A floating toolbar appears instantly with all four tools.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Choose Action</h3>
+          <p>Click Translate, Summarize, Explain, or Rewrite. Results appear in a clean overlay right on the page.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Copy & Use</h3>
+          <p>Copy the result to your clipboard with one click. Use the sidebar for advanced features and settings.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ad -->
+    <div class="ad-container">
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6693622655550119" data-ad-slot="4313080520" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <!-- Languages -->
+    <section class="languages" id="languages">
+      <h2 class="section-title">20+ Languages Supported</h2>
+      <p class="section-sub">Translate between all major world languages</p>
+
+      <div class="lang-grid">
+        <span class="lang-tag">English</span>
+        <span class="lang-tag">Shqip (Albanian)</span>
+        <span class="lang-tag">Fran&ccedil;ais</span>
+        <span class="lang-tag">Deutsch</span>
+        <span class="lang-tag">Espa&ntilde;ol</span>
+        <span class="lang-tag">Italiano</span>
+        <span class="lang-tag">Portugu&ecirc;s</span>
+        <span class="lang-tag">Русский</span>
+        <span class="lang-tag">中文</span>
+        <span class="lang-tag">日本語</span>
+        <span class="lang-tag">한국어</span>
+        <span class="lang-tag">العربية</span>
+        <span class="lang-tag">हिन्दी</span>
+        <span class="lang-tag">T&uuml;rk&ccedil;e</span>
+        <span class="lang-tag">Nederlands</span>
+        <span class="lang-tag">Polski</span>
+        <span class="lang-tag">Svenska</span>
+        <span class="lang-tag">Українська</span>
+        <span class="lang-tag">Ελληνικά</span>
+        <span class="lang-tag">Rom&acirc;n&atilde;</span>
+        <span class="lang-tag">+ Many More</span>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="cta-card">
+        <h2>Ready to Break Language Barriers?</h2>
+        <p>Install Nexus Translator for free and start translating text on any webpage instantly.</p>
+        <a href="https://chrome.google.com/webstore" class="btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Install Nexus Translator — It's Free
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>Nexus Translator &copy; 2026 &middot; <a href="privacy-policy-nexustranslator.html">Privacy Policy</a> &middot; Powered by <a href="https://nexuswallet.org">nexuswallet.org</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
