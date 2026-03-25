@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusVPN - Fast & Secure VPN Extension</title>
+<meta name="description" content="NexusVPN - Free, fast and secure proxy-based VPN extension for Chrome. Protect your privacy with one click.">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6693622655550119" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#0a0a1a;color:#e2e8f0;overflow-x:hidden}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(10,10,26,0.8);border-bottom:1px solid rgba(255,255,255,0.05)}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo svg{width:32px;height:32px}
+.nav-logo span{font-size:20px;font-weight:300;color:#fff}
+.nav-logo b{font-weight:700}
+.nav-links{display:flex;gap:30px}
+.nav-links a{color:rgba(255,255,255,0.6);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{padding:10px 24px;background:#6366f1;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;transition:background 0.2s}
+.nav-cta:hover{background:#5558e6}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 80px 80px;position:relative;overflow:hidden}
+.hero-glow1{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 70%);top:-200px;right:200px}
+.hero-glow2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 70%);bottom:-100px;left:100px}
+
+.hero-left{flex:1;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:20px;font-size:12px;color:#22c55e;font-weight:500;margin-bottom:24px}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
+.hero h1{font-size:56px;font-weight:800;line-height:1.1;margin-bottom:20px}
+.hero h1 span{background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:18px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:36px;max-width:500px}
+.hero-buttons{display:flex;gap:14px}
+.btn-primary{padding:14px 32px;background:#6366f1;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all 0.2s}
+.btn-primary:hover{background:#5558e6;transform:translateY(-2px);box-shadow:0 8px 25px rgba(99,102,241,0.3)}
+.btn-secondary{padding:14px 32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;border-radius:12px;font-size:16px;font-weight:600;text-decoration:none;transition:all 0.2s}
+.btn-secondary:hover{background:rgba(255,255,255,0.1)}
+
+.hero-right{width:450px;z-index:2;display:flex;justify-content:center}
+
+/* Phone mockup */
+.phone{width:320px;background:#fff;border-radius:36px;box-shadow:0 20px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.08);overflow:hidden;transform:perspective(1000px) rotateY(-5deg);transition:transform 0.3s}
+.phone:hover{transform:perspective(1000px) rotateY(0deg)}
+.phone-notch{height:36px;background:#f8f9fb;display:flex;align-items:center;justify-content:center}
+.phone-notch-inner{width:80px;height:22px;background:#1a1a2e;border-radius:0 0 12px 12px}
+.p-inner{padding:0}
+.p-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #eee}
+.p-logo{display:flex;align-items:center;gap:6px;font-size:14px;color:#333}
+.p-logo b{font-weight:700;color:#1a1a2e}
+.p-logo .sh{width:18px;height:18px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:4px}
+.p-sel{margin:12px 16px;padding:11px 13px;border:1px solid #e8e8ee;border-radius:11px;display:flex;align-items:center;gap:9px}
+.p-flag{font-size:20px;width:30px;height:30px;background:#f0f0f5;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.p-cname{font-size:13px;font-weight:600;color:#1a1a2e;flex:1}
+.p-center{display:flex;flex-direction:column;align-items:center;padding:22px 0 14px}
+.p-shield{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#86efac,#22c55e,#16a34a);box-shadow:0 4px 20px rgba(34,197,94,0.35);display:flex;align-items:center;justify-content:center}
+.p-stop{width:20px;height:20px;background:#fff;border-radius:3px}
+.p-timer{margin-top:14px;font-size:20px;color:#333;font-weight:300;letter-spacing:3px}
+.p-stat{display:flex;align-items:center;gap:6px;margin-top:10px}
+.p-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,0.4)}
+.p-stxt{font-size:14px;font-weight:600;color:#333}
+.p-ip{font-size:12px;color:#888;margin-top:3px;font-family:'Consolas',monospace}
+.p-threats{margin:14px 16px;padding:14px;border:1px solid #e8e8ee;border-radius:11px;text-align:center}
+.p-tt{font-size:13px;font-weight:600;color:#333;margin-bottom:8px}
+.p-tr{display:flex;justify-content:center;gap:30px;font-size:12px;color:#888}
+.p-tr b{color:#6366f1}
+
+/* Features */
+.features{padding:100px 80px;position:relative}
+.features h2{font-size:38px;font-weight:700;text-align:center;margin-bottom:12px}
+.features h2 span{color:#6366f1}
+.features .sub{text-align:center;color:rgba(255,255,255,0.4);font-size:16px;margin-bottom:60px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feat-card{padding:32px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;transition:all 0.2s}
+.feat-card:hover{background:rgba(255,255,255,0.05);border-color:rgba(99,102,241,0.2);transform:translateY(-4px)}
+.feat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.feat-icon.purple{background:rgba(139,92,246,0.12)}
+.feat-icon.blue{background:rgba(59,130,246,0.12)}
+.feat-icon.green{background:rgba(34,197,94,0.12)}
+.feat-icon.cyan{background:rgba(6,182,212,0.12)}
+.feat-icon.orange{background:rgba(249,115,22,0.12)}
+.feat-icon.pink{background:rgba(236,72,153,0.12)}
+.feat-card h3{font-size:17px;font-weight:600;margin-bottom:8px;color:#fff}
+.feat-card p{font-size:14px;color:rgba(255,255,255,0.4);line-height:1.6}
+
+/* Servers */
+.servers{padding:100px 80px;text-align:center}
+.servers h2{font-size:38px;font-weight:700;margin-bottom:12px}
+.servers h2 span{color:#22c55e}
+.servers .sub{color:rgba(255,255,255,0.4);font-size:16px;margin-bottom:50px}
+.server-grid{display:flex;justify-content:center;gap:20px;flex-wrap:wrap}
+.server-card{width:200px;padding:28px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;text-align:center;transition:all 0.2s}
+.server-card:hover{border-color:rgba(99,102,241,0.3);transform:translateY(-4px)}
+.server-flag{font-size:40px;margin-bottom:12px}
+.server-name{font-size:16px;font-weight:600;color:#fff;margin-bottom:4px}
+.server-count{font-size:13px;color:rgba(255,255,255,0.35)}
+
+/* CTA */
+.cta{padding:80px;text-align:center}
+.cta-box{padding:60px;background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(34,197,94,0.05));border:1px solid rgba(99,102,241,0.15);border-radius:24px}
+.cta-box h2{font-size:36px;font-weight:700;margin-bottom:14px}
+.cta-box p{color:rgba(255,255,255,0.4);margin-bottom:30px;font-size:16px}
+
+/* Footer */
+footer{padding:40px 80px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center}
+footer span{color:rgba(255,255,255,0.3);font-size:13px}
+footer a{color:rgba(255,255,255,0.4);text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#6366f1"/><path d="M12 5L7 7.2v3.6c0 3.33 2.3 6.44 5 7.2 2.7-.76 5-3.87 5-7.2V7.2L12 5z" fill="white"/></svg>
+    <span>Nexus<b>VPN</b></span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#servers">Servers</a>
+    <a href="https://nexuswallet.org">Nexus Wallet</a>
+  </div>
+  <a class="nav-cta" href="https://chrome.google.com/webstore">Add to Chrome - Free</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-left">
+    <div class="hero-badge">Free VPN Extension</div>
+    <h1>Browse <span>Securely</span>,<br>Stay Anonymous</h1>
+    <p>The fastest free VPN extension for Chrome. Protect your privacy, unblock content, and browse securely with one click. No registration required.</p>
+    <div class="hero-buttons">
+      <a class="btn-primary" href="https://chrome.google.com/webstore">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        Add to Chrome - Free
+      </a>
+      <a class="btn-secondary" href="#features">Learn More</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="phone">
+      <div class="phone-notch"><div class="phone-notch-inner"></div></div>
+      <div class="p-inner">
+        <div class="p-hdr"><div></div><div class="p-logo"><div class="sh"></div>Nexus<b>VPN</b></div><div></div></div>
+        <div class="p-sel"><div class="p-flag">🇦🇱</div><div class="p-cname">Albania - Tirana</div><span style="color:#bbb">▾</span></div>
+        <div class="p-center">
+          <div class="p-shield"><div class="p-stop"></div></div>
+          <div class="p-timer">00 : 12 : 34</div>
+          <div class="p-stat"><div class="p-dot"></div><div class="p-stxt">Connected</div></div>
+          <div class="p-ip">🇦🇱 45.67.0.188</div>
+        </div>
+        <div class="p-threats"><div class="p-tt">Blocked threats</div><div class="p-tr"><span><b>12</b> Phishing</span><span><b>47</b> Ads</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <h2>Powerful <span>Features</span></h2>
+  <p class="sub">Everything you need to browse safely and privately</p>
+  <div class="feat-grid">
+    <div class="feat-card"><div class="feat-icon green">🛡️</div><h3>One-Click Protection</h3><p>Connect to a secure VPN server with a single click. No complicated setup required.</p></div>
+    <div class="feat-card"><div class="feat-icon blue">🔄</div><h3>Auto IP Rotation</h3><p>Your IP changes with every connection, making it harder to track your activity.</p></div>
+    <div class="feat-card"><div class="feat-icon purple">🌍</div><h3>Multiple Locations</h3><p>Choose from servers in Albania, Turkey, Hungary, and the United States.</p></div>
+    <div class="feat-card"><div class="feat-icon cyan">🚫</div><h3>Ad & Phishing Blocker</h3><p>Built-in protection against malicious ads, phishing sites, and malware.</p></div>
+    <div class="feat-card"><div class="feat-icon orange">🌐</div><h3>WebRTC Protection</h3><p>Prevent IP leaks through WebRTC to maintain your anonymity online.</p></div>
+    <div class="feat-card"><div class="feat-icon pink">🎨</div><h3>Dark & Light Theme</h3><p>Choose your preferred theme for a comfortable browsing experience.</p></div>
+  </div>
+</section>
+
+<section class="servers" id="servers">
+  <h2>Server <span>Locations</span></h2>
+  <p class="sub">Connect to servers around the world</p>
+  <div class="server-grid">
+    <div class="server-card"><div class="server-flag">🇦🇱</div><div class="server-name">Albania</div><div class="server-count">759 servers</div></div>
+    <div class="server-card"><div class="server-flag">🇹🇷</div><div class="server-name">Turkey</div><div class="server-count">7 servers</div></div>
+    <div class="server-card"><div class="server-flag">🇭🇺</div><div class="server-name">Hungary</div><div class="server-count">4 servers</div></div>
+    <div class="server-card"><div class="server-flag">🇺🇸</div><div class="server-name">United States</div><div class="server-count">241 servers</div></div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-box">
+    <h2>Ready to Browse Securely?</h2>
+    <p>Join thousands of users protecting their privacy with NexusVPN.</p>
+    <a class="btn-primary" href="https://chrome.google.com/webstore" style="font-size:18px;padding:16px 40px">Add to Chrome - It's Free</a>
+  </div>
+</section>
+
+<footer>
+  <span>&copy; 2026 NexusVPN. All rights reserved.</span>
+  <div style="display:flex;gap:20px">
+    <a href="https://nexuswallet.org">Nexus Wallet</a>
+    <a href="https://nexuswallet.org/privacy.html">Privacy Policy</a>
+    <a href="https://nexuswallet.org/terms.html">Terms of Use</a>
+  </div>
+</footer>
+
+</body>
+</html>
