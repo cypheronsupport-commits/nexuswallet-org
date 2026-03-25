@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusVPN</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6693622655550119" crossorigin="anonymous"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0f1a;color:#fff;font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:30px}
+.logo svg{width:40px;height:40px}
+.logo span{font-size:22px;font-weight:300}
+.logo strong{font-weight:700}
+.ad-container{width:100%;max-width:728px;min-height:250px;background:rgba(255,255,255,0.05);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;overflow:hidden}
+.timer{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:15px}
+.btn{display:none;padding:14px 40px;background:#667eea;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;text-decoration:none;transition:background 0.2s}
+.btn:hover{background:#5a6fd6}
+.btn.show{display:inline-block}
+.progress{width:300px;height:3px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:20px}
+.progress-bar{height:100%;background:#667eea;width:0%;transition:width 0.1s linear}
+</style>
+</head>
+<body>
+<div class="logo">
+<svg viewBox="0 0 24 24" fill="none"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#667eea"/><path d="M12 5L7 7.2v3.6c0 3.33 2.3 6.44 5 7.2 2.7-.76 5-3.87 5-7.2V7.2L12 5z" fill="white"/></svg>
+<span>Nexus<strong>VPN</strong></span>
+</div>
+
+<div class="ad-container">
+<!-- Google AdSense Ad Unit - Replace with your ad unit code -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6693622655550119" data-ad-slot="YOUR_AD_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<div class="progress"><div class="progress-bar" id="bar"></div></div>
+<div class="timer" id="timer">Connecting in 5s...</div>
+<a class="btn" id="btn" href="#">Continue to VPN</a>
+
+<script>
+let s=5;const t=document.getElementById('timer'),b=document.getElementById('bar'),btn=document.getElementById('btn');
+const i=setInterval(()=>{s--;b.style.width=((5-s)/5*100)+'%';if(s>0){t.textContent='Connecting in '+s+'s...';}else{clearInterval(i);t.textContent='Ready!';b.style.width='100%';btn.classList.add('show');}},1000);
+btn.onclick=(e)=>{e.preventDefault();window.close();};
+</script>
+</body>
+</html>
