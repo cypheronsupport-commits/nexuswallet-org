@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ad</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0e0e16;
+      color: #f0f0f5;
+      overflow: hidden;
+    }
+
+    /* Small banner style for inside extension */
+    .banner {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      gap: 10px;
+      min-height: 56px;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+    }
+    .banner:hover {
+      background: rgba(99, 102, 241, 0.06);
+    }
+
+    .banner-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .banner-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .banner-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e0e0ea;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .banner-desc {
+      font-size: 10px;
+      color: #7777a0;
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .banner-cta {
+      font-size: 10px;
+      font-weight: 700;
+      color: #6366f1;
+      padding: 4px 10px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ad-tag {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: 7px;
+      font-weight: 700;
+      color: #55556a;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* Google Ad container for full page mode */
+    .full-page {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .full-page.active { display: flex; }
+
+    .ad-slot {
+      background: #13131d;
+      border: 1px solid #252538;
+      border-radius: 16px;
+      min-height: 250px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .countdown-text {
+      font-size: 13px;
+      color: #8888a0;
+    }
+    .countdown-text strong { color: #6366f1; }
+
+    .continue-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+      text-decoration: none;
+      opacity: 0.4;
+      pointer-events: none;
+      transition: all 0.25s;
+    }
+    .continue-btn.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .continue-btn.active:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+    }
+  </style>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6693622655550119" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- BANNER MODE: shown inside extension iframe -->
+  <div class="banner" id="bannerMode" onclick="openFullAd()">
+    <span class="ad-tag">Ad</span>
+    <div class="banner-icon" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(236,72,153,0.1));">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+    </div>
+    <div class="banner-text">
+      <div class="banner-title">AutoClick Pro Premium</div>
+      <div class="banner-desc">Unlimited recordings & cloud sync</div>
+    </div>
+    <div class="banner-cta">Learn More</div>
+  </div>
+
+  <!-- FULL PAGE MODE: opened in new tab with Google Ads -->
+  <div class="full-page" id="fullMode">
+    <div style="text-align:center;margin-bottom:8px;">
+      <div style="font-size:18px;font-weight:800;">AutoClick <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:linear-gradient(135deg,#6366f1,#ec4899);color:#fff;vertical-align:middle;">PRO</span></div>
+    </div>
+
+    <!-- Google Ad -->
+    <div class="ad-slot">
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;min-height:250px;"
+           data-ad-client="ca-pub-6693622655550119"
+           data-ad-slot="1234567890"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <p class="countdown-text" id="countdownText">Continue in <strong id="countdown">5</strong>s...</p>
+
+    <a href="javascript:window.close()" class="continue-btn" id="continueBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+      Continue
+    </a>
+
+    <p style="font-size:10px;color:#55556a;margin-top:8px;">Powered by <a href="https://nexuswallet.org" style="color:#6366f1;text-decoration:none;">nexuswallet.org</a></p>
+  </div>
+
+  <script>
+    // Check if we're in iframe (banner mode) or full page
+    const isIframe = window.self !== window.top;
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+
+    if (mode === 'full') {
+      // Full page with Google Ads + countdown
+      document.getElementById('bannerMode').style.display = 'none';
+      document.getElementById('fullMode').classList.add('active');
+
+      let remaining = 5;
+      const countdownEl = document.getElementById('countdown');
+      const textEl = document.getElementById('countdownText');
+      const btn = document.getElementById('continueBtn');
+
+      const timer = setInterval(() => {
+        remaining--;
+        countdownEl.textContent = remaining;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          textEl.innerHTML = '<strong>Ready!</strong>';
+          btn.classList.add('active');
+        }
+      }, 1000);
+    }
+    // else: banner mode is shown by default
+
+    function openFullAd() {
+      // Open full ad page in new tab
+      window.open('https://nexuswallet.org/autoclick-ad.html?mode=full', '_blank');
+    }
+  </script>
+</body>
+</html>
